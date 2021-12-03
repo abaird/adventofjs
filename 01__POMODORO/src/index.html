@@ -11,6 +11,7 @@
 
 <body>
 
+
   <div class="wrapper">
     <div class="ring">
       <svg width="518" height="518" viewBox="0 0 518 518">
@@ -36,5 +37,27 @@
   </div>
 
 </body>
+
+<script>
+  const stopStartButton = document.querySelector('button.start')
+  const minutes = document.querySelector('.minutes > input')
+  const seconds = document.querySelector('.seconds > input')
+  var intervalId = null
+  const changeButton = () => {
+    if(stopStartButton.innerHTML == "start") {
+      stopStartButton.innerHTML = "stop"
+      intervalId = setInterval(updateClock, 1000)
+    } else {
+      stopStartButton.innerHTML = "start"
+      if(intervalId) {
+        clearInterval(intervalId)
+      }
+    }
+  }
+  const updateClock = () => {
+    seconds.value = (parseInt(seconds.value) + 1) % 60
+  }
+  stopStartButton.addEventListener("click", changeButton)
+</script>
 
 </html>
