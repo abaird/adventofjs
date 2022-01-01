@@ -15,7 +15,7 @@
   <div class="wrapper">
     <div class="ring">
       <svg width="518" height="518" viewBox="0 0 518 518">
-        <circle stroke-width="9px" x="0" y="y" cx="259" cy="259" r="254" />
+        <circle stroke-width="9px" x="0" y="y" cx="259" cy="259" r="254"/>
       </svg>
     </div>
 
@@ -39,25 +39,91 @@
 </body>
 
 <script>
+  const ring = document.querySelector('.ring')
   const stopStartButton = document.querySelector('button.start')
-  const minutes = document.querySelector('.minutes > input')
-  const seconds = document.querySelector('.seconds > input')
+  const settingsButton = document.querySelector('.settings img')
+  const minutesElement = document.querySelector('.minutes > input')
+  const colon = document.querySelector('.colon')
+  const secondsElement = document.querySelector('.seconds > input')
+  var currentMinutes = minutesElement.value
+  var currentSeconds = secondsElement.value
+  var inEditMode = false
   var intervalId = null
+
+  const editMinutes = (e) => {
+    const minutes = e.target.value
+    if(parseInt(minutes) && parseInt(minutes) >= 0 && parseInt(minutes) <= 99) { 
+      currentMinutes = minutes.padStart(2, "0")
+      minutesElement.value = currentMinutes.padStart(2, "0")
+      return 
+    } 
+    minutesElement.value = currentMinutes
+  }
+
+  const editSeconds = (e) => {
+    const seconds = e.target.value
+    if(parseInt(seconds) && parseInt(seconds) >= 1 && parseInt(seconds) <= 99) { 
+      currentSeconds = seconds.padStart(2, "0")
+      secondsElement.value = currentSeconds.padStart(2, "0")
+      return 
+    } 
+    secondsElement.value = currentSeconds
+  }
+
+  const editSettings = () => {
+    if (inEditMode) {
+      inEditMode = !inEditMode
+      minutesElement.disabled = true
+      secondsElement.disabled = true
+      settingsButton.src = "images/gear.svg"
+    } else {
+      inEditMode = !inEditMode
+      minutesElement.disabled = false
+      secondsElement.disabled = false
+      settingsButton.src = "images/check.svg"
+    }
+  }
+
   const changeButton = () => {
     if(stopStartButton.innerHTML == "start") {
       stopStartButton.innerHTML = "stop"
       intervalId = setInterval(updateClock, 1000)
     } else {
       stopStartButton.innerHTML = "start"
+      colon.style.visibility = ""
       if(intervalId) {
         clearInterval(intervalId)
       }
     }
   }
-  const updateClock = () => {
-    seconds.value = (parseInt(seconds.value) + 1) % 60
+
+  const timerEnd = () => {
+    stopStartButton.innerHTML = "start"
+    ring.classList.add("ending")
+    clearInterval(intervalId)
+    alert("Timer Finished")
   }
+
+  const updateClock = () => {
+    if (parseInt(secondsElement.value) === 0 && parseInt(minutesElement.value) === 0) {
+      timerEnd()
+    } else if (parseInt(secondsElement.value) === 0) {
+      secondsElement.value = 59
+      minutesElement.value = String(minutesElement.value - 1).padStart(2, "0")
+    } else {
+      secondsElement.value = String(parseInt(secondsElement.value) - 1).padStart(2, "0")
+    }
+    if(colon.style.visibility === "hidden"){
+      colon.style.visibility = ""
+    } else {
+      colon.style.visibility = "hidden"
+    }
+  }
+
   stopStartButton.addEventListener("click", changeButton)
+  settingsButton.addEventListener("click", editSettings)
+  minutesElement.addEventListener("change", editMinutes)
+  secondsElement.addEventListener("change", editSeconds)
 </script>
 
 </html>
